@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:sample_contact/pages/boarding_page.dart';
+import 'pages/boarding_page.dart';
 
 void main() {
   runApp(const MyApp());
