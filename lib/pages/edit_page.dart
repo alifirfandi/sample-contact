@@ -119,6 +119,9 @@ class _EditPageState extends State<EditPage> {
                         youtube: youtubeController.text,
                       ),
                     );
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(content: Text('Success Add Contact! Please Refresh')),
+                    );
                   } else {
                     User.users[widget.index] = User(
                       image: User.users[widget.index].image,
@@ -129,7 +132,11 @@ class _EditPageState extends State<EditPage> {
                       twitter: twitterController.text,
                       youtube: youtubeController.text,
                     );
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(content: Text('Success Save Contact! Please Refresh')),
+                    );
                   }
+                  Navigator.of(context).pop();
                 }
               },
               child: Text(widget.index == -1 ? 'Add' : 'Save'),
