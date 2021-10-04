@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import '../provider/user_provider.dart';
 import 'pages/boarding_page.dart';
 
 void main() {
@@ -10,9 +12,12 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const MaterialApp(
-      debugShowCheckedModeBanner: false,
-      home: BoardingPage(),
+    return ChangeNotifierProvider(
+      create: (context) => UserProvider(),
+      child: const MaterialApp(
+        debugShowCheckedModeBanner: false,
+        home: BoardingPage(),
+      ),
     );
   }
 }

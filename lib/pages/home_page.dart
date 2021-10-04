@@ -1,16 +1,11 @@
 import 'package:flutter/material.dart';
-
-import '../model/user.dart';
+import 'package:provider/provider.dart';
+import '../provider/user_provider.dart';
 import 'edit_page.dart';
 
-class HomePage extends StatefulWidget {
+class HomePage extends StatelessWidget {
   const HomePage({Key? key}) : super(key: key);
 
-  @override
-  _HomePageState createState() => _HomePageState();
-}
-
-class _HomePageState extends State<HomePage> {
   Widget _header() {
     return const Text(
       'My Contact',
@@ -22,7 +17,7 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
-  Widget _searchBox() {
+  Widget _searchBox(BuildContext context) {
     return TextField(
       style: const TextStyle(color: Colors.white),
       onTap: () {
@@ -89,81 +84,86 @@ class _HomePageState extends State<HomePage> {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
-        Text(
-          'Friends (${User.users.length})',
-          style: const TextStyle(fontSize: 20, color: Colors.white),
-        ),
-        IconButton(
-          onPressed: () {
-            setState(() {});
-          },
-          icon: const Icon(Icons.refresh, color: Colors.white),
-        )
+        Consumer<UserProvider>(builder: (context, userProvider, _) {
+          return Text(
+            'Friends (${userProvider.users.length})',
+            style: const TextStyle(fontSize: 20, color: Colors.white),
+          );
+        }),
       ],
     );
   }
 
   Widget _listContact() {
-    return ListView.separated(
-      shrinkWrap: true,
-      primary: false,
-      itemCount: User.users.length,
-      separatorBuilder: (context, index) {
-        return Divider(
-          color: Colors.grey.withOpacity(0.4),
-          thickness: 0.5,
+    return Consumer<UserProvider>(builder: (context, userProvider, _) {
+      if (userProvider.users.isEmpty) {
+        return const Text(
+          "No Contacts",
+          style: TextStyle(color: Colors.white),
         );
-      },
-      itemBuilder: (BuildContext context, int index) => InkWell(
-        splashColor: Colors.grey.withOpacity(0.1),
-        onTap: () {
-          Navigator.of(context).push(
-            MaterialPageRoute(
-              builder: (context) =>
-                  EditPage(user: User.users[index], index: index),
-            ),
-          );
-        },
-        child: Row(
-          children: [
-            Container(
-              margin: EdgeInsets.fromLTRB(0, 10, 15, 10),
-              height: 75,
-              width: 75,
-              decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                image: DecorationImage(
-                  image: AssetImage(User.users[index].image),
-                  fit: BoxFit.contain,
+      } else {
+        return ListView.separated(
+          shrinkWrap: true,
+          primary: false,
+          itemCount: userProvider.users.length,
+          separatorBuilder: (context, index) {
+            return Divider(
+              color: Colors.grey.withOpacity(0.4),
+              thickness: 0.5,
+            );
+          },
+          itemBuilder: (BuildContext context, int index) => InkWell(
+            splashColor: Colors.grey.withOpacity(0.1),
+            onTap: () {
+              Navigator.of(context).push(
+                MaterialPageRoute(
+                  builder: (context) =>
+                      EditPage(user: userProvider.users[index], index: index),
                 ),
-              ),
-            ),
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
+              );
+            },
+            child: Row(
               children: [
-                Text(
-                  User.users[index].name,
-                  style: const TextStyle(
-                    color: Colors.white,
-                    fontSize: 20,
+                Container(
+                  margin: EdgeInsets.fromLTRB(0, 10, 15, 10),
+                  height: 75,
+                  width: 75,
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    image: DecorationImage(
+                      image: AssetImage(userProvider.users[index].image),
+                      fit: BoxFit.contain,
+                    ),
                   ),
                 ),
-                const SizedBox(
-                  height: 10,
-                ),
-                Text(
-                  User.users[index].location,
-                  style: TextStyle(
-                    fontSize: 16,
-                    color: Colors.white.withOpacity(0.8),
-                  ),
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      userProvider.users[index].name,
+                      style: const TextStyle(
+                        color: Colors.white,
+                        fontSize: 20,
+                      ),
+                    ),
+                    const SizedBox(
+                      height: 10,
+                    ),
+                    Text(
+                      userProvider.users[index].location,
+                      style: TextStyle(
+                        fontSize: 16,
+                        color: Colors.white.withOpacity(0.8),
+                      ),
+                    )
+                  ],
                 )
               ],
-            )
-          ],
-        ),
-      ),
-    );
+            ),
+          ),
+        );
+      }
+    });
   }
 
   @override
@@ -178,7 +178,7 @@ class _HomePageState extends State<HomePage> {
             const SizedBox(height: 30),
             _header(),
             const SizedBox(height: 30),
-            _searchBox(),
+            _searchBox(context),
             const SizedBox(height: 30),
             _textRecent(),
             const SizedBox(height: 10),
@@ -188,15 +188,17 @@ class _HomePageState extends State<HomePage> {
           ],
         ),
       ),
-      floatingActionButton: FloatingActionButton(
-        child: const Icon(Icons.add),
-        onPressed: () {
-          Navigator.of(context).push(
-            MaterialPageRoute(
-              builder: (context) => const EditPage(),
-            ),
-          );
-        },
+      floatingActionButton: Consumer<UserProvider>(
+        builder: (context, userProvider, _) => FloatingActionButton(
+          child: const Icon(Icons.add),
+          onPressed: () {
+            Navigator.of(context).push(
+              MaterialPageRoute(
+                builder: (context) => const EditPage(),
+              ),
+            );
+          },
+        ),
       ),
     );
   }

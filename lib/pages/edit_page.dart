@@ -1,6 +1,8 @@
 import 'dart:math';
 
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import '../provider/user_provider.dart';
 
 import '../model/user.dart';
 
@@ -100,46 +102,45 @@ class _EditPageState extends State<EditPage> {
             const SizedBox(
               height: 25,
             ),
-            ElevatedButton(
-              onPressed: () {
-                if (!_formKey.currentState!.validate()) {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(content: Text('Empty Data')),
-                  );
-                } else {
-                  if (widget.index == -1) {
-                    User.users.add(
-                      User(
-                        image: "assets/${Random().nextInt(5) + 20}.jpg",
-                        name: nameController.text,
-                        location: locationController.text,
-                        email: emailController.text,
-                        instagram: instagramController.text,
-                        twitter: twitterController.text,
-                        youtube: youtubeController.text,
-                      ),
-                    );
+            Consumer<UserProvider>(
+              builder: (context, userProvider, _) => ElevatedButton(
+                onPressed: () {
+                  if (!_formKey.currentState!.validate()) {
                     ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(content: Text('Success Add Contact! Please Refresh')),
+                      const SnackBar(content: Text('Empty Data')),
                     );
                   } else {
-                    User.users[widget.index] = User(
-                      image: User.users[widget.index].image,
-                      name: nameController.text,
-                      location: locationController.text,
-                      email: emailController.text,
-                      instagram: instagramController.text,
-                      twitter: twitterController.text,
-                      youtube: youtubeController.text,
-                    );
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(content: Text('Success Save Contact! Please Refresh')),
-                    );
+                    if (widget.index == -1) {
+                      userProvider.addUser(
+                        User(
+                          image: "assets/${Random().nextInt(5) + 20}.jpg",
+                          name: nameController.text,
+                          location: locationController.text,
+                          email: emailController.text,
+                          instagram: instagramController.text,
+                          twitter: twitterController.text,
+                          youtube: youtubeController.text,
+                        ),
+                      );
+                    } else {
+                      userProvider.editUser(
+                        User(
+                          image: userProvider.users[widget.index].image,
+                          name: nameController.text,
+                          location: locationController.text,
+                          email: emailController.text,
+                          instagram: instagramController.text,
+                          twitter: twitterController.text,
+                          youtube: youtubeController.text,
+                        ),
+                        widget.index,
+                      );
+                    }
+                    Navigator.of(context).pop();
                   }
-                  Navigator.of(context).pop();
-                }
-              },
-              child: Text(widget.index == -1 ? 'Add' : 'Save'),
+                },
+                child: Text(widget.index == -1 ? 'Add' : 'Save'),
+              ),
             )
           ],
         ),
